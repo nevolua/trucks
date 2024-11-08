@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Truck Inventory</title>
+  <style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
+
+    /* Global Styles */
+    body {
+      font-family: 'Rubik', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    /* Header Styles */
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      animation: fadeInDown 1s ease;
+    }
+
+    /* Inventory Styles */
+    .inventory-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 0;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .inventory-item {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 60%;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: transform 0.3s ease;
+    }
+
+    .inventory-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .inventory-item h3 {
+      margin-top: 0;
+    }
+
+    .inventory-item p {
+      margin: 5px 0;
+    }
+
+    .inventory-item a {
+      color: #333;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .inventory-item a:hover {
+      color: #555;
+    }
+
+    /* Sorting Styles */
+    .sorting-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease;
+    }
+
+    .sorting-container label {
+      margin-right: 10px;
+      color: #333;
+    }
+
+    .sorting-container select {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .sorting-container select:hover {
+      background-color: #555;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sorting-container">
+    <label for="sortBy"  style = "margin-top: 20px;">Sort by:</label>
+    <select id="sortBy" style = "margin-top: 20px;">
+      <option value="price">Price</option>
+      <option value="mileage">Mileage</option>
+      <option value="color">Color</option>
+      <option value="location">Location</option>
+    </select>
+  </div>
+
+  <div class="inventory-container" id="inventoryContainer">
+    <!-- Truck listings will be dynamically generated here -->
+  </div>
+
+  <script>
+    // Sample data from the provided spreadsheet
+    const truckData = [
+      {
+        make: "GMC",
+        model: "Sierra 1500",
+        year: 2010,
+        price: 13990,
+        mileage: 131000,
+        color: "White",
+        location: "Plano, TX",
+        url: "https://www.cars.com/vehicledetail/cdf75732-f3a0-452e-935b-eefdd06ab7ce/GMC Sierra 1500"
+      },
+      {
+        make: "GMC",
+        model: "Sierra 1500",
+        year: 2011,
+        price: 14975,
+        mileage: 95000,
+        color: "Silver",
+        location: "Bowie, TX",
+        url: "https://www.edmunds.com/gmc/sierra-1500/2011/vin/3GTP1VE05BG105892/?radius=100"
+      },
+      {
+        make: "Ford",
+        model: "F-150",
+        year: 2008,
+        price: 13990,
+        mileage: 60000,
+        color: "Dark Blue",
+        location: "Nevada, TX",
+        url: "https://www.truecar.com/used-cars-for-sale/listing/1FTRW12W78FB91907/?referrer_id=autotempest"
+      },
+      {
+        make: "Ford",
+        model: "F-150",
+        year: 2005,
+        price: 8995,
+        mileage: 110000,
+        color: "Dark Blue",
+        location: "Garland, TX",
+        url: "https://www.truecar.com/used-cars-for-sale/listing/1FTPW12505KB59365/?referrer_id=autotempest"
+      },
+      {
+        make: "Dodge",
+        model: "Ram 1500",
+        year: 2007,
+        price: 12495,
+        mileage: 88000,
+        color: "Dark Red",
+        location: "Dallas, TX",
+        url: "https://www.truecar.com/used-cars-for-sale/listing/1D7HA18277J639935/?referrer_id=autotempest"
+      },
+      {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2011,
+        price: 12974,
+        mileage: 121000,
+        color: "White",
+        location: "Richland Hills, TX",
+        url: "https://www.carfax.com/vehicle/3GCPCSE05BG337711"
+      },
+      {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2011,
+        price: 13990,
+        mileage: 126000,
+        color: "White",
+        location: "Dallas, TX",
+        url: "https://www.cars.com/vehicledetail/f007bab2-fe67-4746-b068-c782f701c7b4/"
+      },
+      {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2009,
+        price: 12775,
+        mileage: 122000,
+        color: "White",
+        location: "Keller, TX",
+        url: "https://www.cars.com/vehicledetail/37cee25f-a3e3-4242-bd89-dbf1bb75a2ad/"
+      },
+      {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2015,
+        price: 15500,
+        mileage: 120000,
+        color: "Black",
+        location: "Garland, TX",
+        url: "https://www.carfax.com/vehicle/1GCRCPEC6FZ281512"
+      },
+      {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2015,
+        price: 15500,
+        mileage: 120000,
+        color: "Black",
+        location: "Garland, TX",
+        url: "https://www.truecar.com/used-cars-for-sale/listing/1GCRCPEC6FZ281512/?referrer_id=autotempest"
+      },
+      {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2015,
+        price: 15999,
+        mileage: 98000,
+        color: "Silver",
+        location: "Garland, TX",
+        url: "https://www.carfax.com/vehicle/1GCRCPEC0FZ241569"
+      }
+    ];
+
+    // Function to create and append truck listings to the container
+    function displayTruckListings() {
+      const inventoryContainer = document.getElementById('inventoryContainer');
+      inventoryContainer.innerHTML = '';
+
+      truckData.forEach(truck => {
+        const inventoryItem = document.createElement('div');
+        inventoryItem.classList.add('inventory-item');
+
+        const makeModel = document.createElement('h3');
+        makeModel.textContent = `${truck.make} ${truck.model}`;
+
+        const year = document.createElement('p');
+        year.textContent = `Year: ${truck.year}`;
+
+        const price = document.createElement('p');
+        price.textContent = `Price: $${truck.price.toLocaleString()}`;
+
+        const mileage = document.createElement('p');
+        mileage.textContent = `Mileage: ${truck.mileage.toLocaleString()} miles`;
+
+        const color = document.createElement('p');
+        color.textContent = `Color: ${truck.color}`;
+
+        const location = document.createElement('p');
+        location.textContent = `Location: ${truck.location}`;
+
+        const link = document.createElement('a');
+        link.href = truck.url;
+        link.target = '_blank';
+        link.textContent = 'View Listing';
+
+        inventoryItem.appendChild(makeModel);
+        inventoryItem.appendChild(year);
+        inventoryItem.appendChild(price);
+        inventoryItem.appendChild(mileage);
+        inventoryItem.appendChild(color);
+        inventoryItem.appendChild(location);
+        inventoryItem.appendChild(link);
+
+        inventoryContainer.appendChild(inventoryItem);
+      });
+    }
+
+    // Sorting function
+    function sortTruckData(sortBy) {
+      switch (sortBy) {
+        case 'price':
+          truckData.sort((a, b) => a.price - b.price);
+          break;
+        case 'mileage':
+          truckData.sort((a, b) => a.mileage - b.mileage);
+          break;
+        case 'color':
+          truckData.sort((a, b) => a.color.localeCompare(b.color));
+          break;
+        case 'location':
+          truckData.sort((a, b) => a.location.localeCompare(b.location));
+          break;
+      }
+      displayTruckListings();
+    }
+
+    // Add event listener for sorting
+    const sortBySelect = document.getElementById('sortBy');
+    sortBySelect.addEventListener('change', (event) => {
+      sortTruckData(event.target.value);
+    });
+
+    // Initial display of truck listings
+    displayTruckListings();
+  </script>
+</body>
+</html>
